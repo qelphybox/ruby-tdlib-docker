@@ -63,5 +63,5 @@ volumes:
 
 ---
 
-**Image maintained by [kirillbobykin](https://github.com/kirillbobykin).** PRs and issues welcome!
+**Image maintained by [kirillbobykin](https://github.com/qelphybox).** PRs and issues welcome!
 
