@@ -1,0 +1,10 @@
+DOCKER HUB DESCRIPTION:
+Ruby + TDLib Docker images for Telegram bots. Alpine and Slim variants included.
+
+DOCKER HUB CATEGORY:
+Development Tools
+
+ALTERNATIVE CATEGORIES (if Development Tools is not available):
+- Language Runtime
+- Infrastructure
+
