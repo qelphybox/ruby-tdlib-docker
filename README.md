@@ -21,6 +21,12 @@ Useful for running Ruby applications that depend on [tdlib-ruby](https://github.
 - Better compatibility with Debian packages
 - Suitable for development and testing
 
+### Bookworm Version (Debian 12)
+- **Image**: `kirillbobykin/ruby-tdlib:3-bookworm-tdlib-1.8.35-latest`
+- Ruby 3 based on Debian Bookworm
+- Full Debian environment with more packages available
+- Ideal for applications requiring Debian-specific tools
+
 ## Features
 
 - TDLib built from commit `9b6ff5863e5d0b2a07b50f4aa1a3344a51a1f80f` (v1.8.35)
@@ -29,12 +35,12 @@ Useful for running Ruby applications that depend on [tdlib-ruby](https://github.
 
 ## Usage
 
-| Action | Alpine | Slim |
-|--------|--------|------|
-| **Build** | `make build-image` | `make build-slim-image` |
-| **Push** | `make push-image` | `make push-slim-image` |
-| **Run** | `make run-image` | `make run-slim-image` |
-| **Run interactively** | `docker run --rm -it kirillbobykin/ruby-tdlib:3.4.7-alpine-tdlib-1.8.35-latest` | `docker run --rm -it kirillbobykin/ruby-tdlib:3-slim-tdlib-1.8.35-latest` |
+| Action | Alpine | Slim | Bookworm |
+|--------|--------|------|----------|
+| **Build** | `make build-image` | `make build-slim-image` | `make build-bookworm-image` |
+| **Push** | `make push-image` | `make push-slim-image` | `make push-bookworm-image` |
+| **Run** | `make run-image` | `make run-slim-image` | `make run-bookworm-image` |
+| **Run interactively** | `docker run --rm -it kirillbobykin/ruby-tdlib:3.4.7-alpine-tdlib-1.8.35-latest` | `docker run --rm -it kirillbobykin/ruby-tdlib:3-slim-tdlib-1.8.35-latest` | `docker run --rm -it kirillbobykin/ruby-tdlib:3-bookworm-tdlib-1.8.35-latest` |
 
 > The TDLib build output is at `/tdlib/build`.  
 > You can mount your source code and use this image as a base for your own TDLib-dependent apps.
@@ -59,6 +65,19 @@ volumes:
 services:
   my-tdlib-app:
     image: kirillbobykin/ruby-tdlib:3-slim-tdlib-1.8.35-latest
+    volumes:
+      - .:/app
+      - tdlib-session:/root/.tdlib-ruby
+
+volumes:
+  tdlib-session:
+```
+
+**Bookworm version:**
+```yaml
+services:
+  my-tdlib-app:
+    image: kirillbobykin/ruby-tdlib:3-bookworm-tdlib-1.8.35-latest
     volumes:
       - .:/app
       - tdlib-session:/root/.tdlib-ruby

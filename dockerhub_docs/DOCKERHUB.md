@@ -11,6 +11,7 @@
 
 - [`3.4.7-alpine-tdlib-1.8.35-latest`, `3.4.7-alpine`, `alpine`, `latest`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/Dockerfile)
 - [`3-slim-tdlib-1.8.35-latest`, `3-slim`, `slim`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/slim.Dockerfile)
+- [`3-bookworm-tdlib-1.8.35-latest`, `3-bookworm`, `bookworm`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/bookworm.Dockerfile)
 
 ## What is Ruby TDLib Docker?
 
@@ -30,6 +31,11 @@ docker run --rm -it kirillbobykin/ruby-tdlib:3.4.7-alpine-tdlib-1.8.35-latest
 **Slim version:**
 ```bash
 docker run --rm -it kirillbobykin/ruby-tdlib:3-slim-tdlib-1.8.35-latest
+```
+
+**Bookworm version:**
+```bash
+docker run --rm -it kirillbobykin/ruby-tdlib:3-bookworm-tdlib-1.8.35-latest
 ```
 
 ### Run a Ruby Script
@@ -89,6 +95,15 @@ This variant is based on the official `ruby:3-slim` image (Debian-based) and pro
 - **Ruby 3** on Debian slim
 - **TDLib 1.8.35** built from the same commit as Alpine version
 - **Suitable for development** - Easier to install additional Debian packages
+
+### `bookworm`
+
+This variant is based on the official `ruby:3-bookworm` image (Debian 12) and provides:
+
+- **Full Debian environment** with comprehensive package availability
+- **Ruby 3** on Debian Bookworm
+- **TDLib 1.8.35** built from the same commit as other variants
+- **Ideal for complex applications** - Access to full Debian package ecosystem
 
 ## Environment Variables
 

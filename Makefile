@@ -15,3 +15,12 @@ push-slim-image:
 
 run-slim-image:
 	docker run --rm -it kirillbobykin/ruby-tdlib:3-slim-tdlib-1.8.35-latest
+
+build-bookworm-image:
+	docker build -f bookworm.Dockerfile . -t kirillbobykin/ruby-tdlib:3-bookworm-tdlib-1.8.35-latest
+
+push-bookworm-image:
+	docker push kirillbobykin/ruby-tdlib:3-bookworm-tdlib-1.8.35-latest
+
+run-bookworm-image:
+	docker run --rm -it kirillbobykin/ruby-tdlib:3-bookworm-tdlib-1.8.35-latest
