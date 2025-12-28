@@ -9,7 +9,7 @@ RUN git clone https://github.com/tdlib/td.git /tdlib \
     && git checkout 9b6ff5863e5d0b2a07b50f4aa1a3344a51a1f80f \
     && mkdir build \
     && cd build \
-    && cmake -DCMAKE_BUILD_TYPE=Release .. \
+    && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 .. \
     && cmake --build .
 
 RUN apk add --no-cache build-base
