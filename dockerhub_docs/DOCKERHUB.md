@@ -11,12 +11,40 @@
 
 The project builds images for **Ruby 4.0, 3.4, 3.3, 3.2** on **Alpine, Debian Slim, and Debian Bookworm**.
 
+All tags are available in two forms:
+1. Short (e.g., `3.4-alpine`)
+2. With TDLib version suffix (e.g., `3.4-alpine-tdlib-1.8.35`)
+
+### List of Major Tags
+
 - [`latest`, `4.0-trixie`, `4.0`, `4`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/debian.Dockerfile)
 - [`4.0-alpine`, `3.4-alpine`, `3.3-alpine`, `3.2-alpine`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/Dockerfile)
 - [`4.0-slim`, `3.4-slim`, `3.3-slim`, `3.2-slim`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/debian.Dockerfile)
 - [`4.0-bookworm`, `3.4-bookworm`, `3.3-bookworm`, `3.2-bookworm`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/debian.Dockerfile)
 
-> All tags include an alias with the full TDLib version suffix, e.g., `3.4-alpine-tdlib-1.8.35`.
+### Detailed Tag List
+
+#### Ruby 4.0.0 (Latest)
+- **Alpine**: `4.0.0-alpine`, `4.0-alpine`, `4-alpine`
+- **Slim**: `4.0.0-slim`, `4.0-slim`, `4-slim`
+- **Default (Trixie)**: `latest`, `4.0.0`, `4.0`, `4`
+
+#### Ruby 3.4.8 / 3.4.7 / 3.4.6
+- **Alpine**: `3.4.8-alpine`, `3.4.7-alpine`, `3.4.6-alpine`, `3.4-alpine`
+- **Slim**: `3.4.8-slim`, `3.4.7-slim`, `3.4.6-slim`, `3.4-slim`
+- **Bookworm**: `3.4.8-bookworm`, `3.4.7-bookworm`, `3.4.6-bookworm`, `3.4-bookworm`
+
+#### Ruby 3.3.10
+- **Alpine**: `3.3.10-alpine`, `3.3-alpine`
+- **Slim**: `3.3.10-slim`, `3.3-slim`
+- **Bookworm**: `3.3.10-bookworm`, `3.3-bookworm`
+
+#### Ruby 3.2.9
+- **Alpine**: `3.2.9-alpine`, `3.2-alpine`
+- **Slim**: `3.2.9-slim`, `3.2-slim`
+- **Bookworm**: `3.2.9-bookworm`, `3.2-bookworm`
+
+> Note: All combinations above also support explicit OS version suffixes (e.g., `alpine3.23`, `trixie`) and TDLib version suffixes.
 
 ## What is Ruby TDLib Docker?
 
