@@ -9,39 +9,38 @@
 
 ## Supported Tags and Respective `Dockerfile` Links
 
-- [`3.4.7-alpine-tdlib-1.8.35-latest`, `3.4.7-alpine`, `alpine`, `latest`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/Dockerfile)
-- [`3-slim-tdlib-1.8.35-latest`, `3-slim`, `slim`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/slim.Dockerfile)
-- [`3-bookworm-tdlib-1.8.35-latest`, `3-bookworm`, `bookworm`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/bookworm.Dockerfile)
+The project builds images for **Ruby 4.0, 3.4, 3.3, 3.2** on **Alpine, Debian Slim, and Debian Bookworm**.
+
+- [`latest`, `4.0-trixie`, `4.0`, `4`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/debian.Dockerfile)
+- [`4.0-alpine`, `3.4-alpine`, `3.3-alpine`, `3.2-alpine`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/Dockerfile)
+- [`4.0-slim`, `3.4-slim`, `3.3-slim`, `3.2-slim`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/debian.Dockerfile)
+- [`4.0-bookworm`, `3.4-bookworm`, `3.3-bookworm`, `3.2-bookworm`](https://github.com/qelphybox/ruby-tdlib-docker/blob/main/debian.Dockerfile)
+
+> All tags include an alias with the full TDLib version suffix, e.g., `3.4-alpine-tdlib-1.8.35`.
 
 ## What is Ruby TDLib Docker?
 
-Ruby TDLib Docker provides minimal Docker images containing Ruby, [TDLib](https://github.com/tdlib/td) (Telegram Database Library), and necessary dependencies. These images are useful for running Ruby applications that depend on [tdlib-ruby](https://github.com/tdlib/tdlib-ruby) or building Telegram bots and clients.
+Ruby TDLib Docker provides minimal Docker images containing **Ruby**, **TDLib** (Telegram Database Library) **v1.8.35**, and necessary dependencies. These images are ready-to-use for running Ruby applications that depend on [tdlib-ruby](https://github.com/tdlib/tdlib-ruby) or building Telegram bots and clients.
 
-TDLib is a cross-platform library for building Telegram clients. This Docker image includes a pre-built version of TDLib compiled from a specific commit, making it easy to get started with Telegram bot development in Ruby.
+TDLib is pre-compiled from commit `9b6ff5863e5d0b2a07b50f4aa1a3344a51a1f80f` (v1.8.35), saving you significant build time.
 
 ## How to Use This Image
 
 ### Run an Interactive Shell
 
-**Alpine version:**
+**Alpine version (Ruby 3.4):**
 ```bash
-docker run --rm -it kirillbobykin/ruby-tdlib:3.4.7-alpine-tdlib-1.8.35-latest
+docker run --rm -it kirillbobykin/ruby-tdlib:3.4-alpine sh
 ```
 
-**Slim version:**
+**Slim version (Ruby 4.0):**
 ```bash
-docker run --rm -it kirillbobykin/ruby-tdlib:3-slim-tdlib-1.8.35-latest
+docker run --rm -it kirillbobykin/ruby-tdlib:4.0-slim bash
 ```
 
-**Bookworm version:**
+**Latest Stable (Ruby 4.0 + Trixie):**
 ```bash
-docker run --rm -it kirillbobykin/ruby-tdlib:3-bookworm-tdlib-1.8.35-latest
-```
-
-### Run a Ruby Script
-
-```bash
-docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp kirillbobykin/ruby-tdlib:3.4.7-alpine-tdlib-1.8.35-latest ruby your-script.rb
+docker run --rm -it kirillbobykin/ruby-tdlib:latest bash
 ```
 
 ### Use as Base Image
@@ -49,7 +48,8 @@ docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp kirillbobykin/ruby-td
 Create a `Dockerfile` in your project:
 
 ```dockerfile
-FROM kirillbobykin/ruby-tdlib:3.4.7-alpine-tdlib-1.8.35-latest
+# Choose your preferred version
+FROM kirillbobykin/ruby-tdlib:3.4-alpine
 
 WORKDIR /app
 COPY Gemfile Gemfile.lock ./
@@ -65,9 +65,10 @@ CMD ["ruby", "app.rb"]
 ```yaml
 services:
   my-tdlib-app:
-    image: kirillbobykin/ruby-tdlib:3.4.7-alpine-tdlib-1.8.35-latest
+    image: kirillbobykin/ruby-tdlib:3.4-alpine
     volumes:
       - .:/app
+      # Persist TDLib session data
       - tdlib-session:/root/.tdlib-ruby
     working_dir: /app
     command: ruby app.rb
@@ -80,50 +81,39 @@ volumes:
 
 ### `alpine` (Recommended)
 
-This is the default image. It's based on the official `ruby:3.4.7-alpine3.22` image and provides:
-
-- **Smallest image size** - Ideal for production deployments
-- **Ruby 3.4.7** on Alpine Linux 3.22
-- **TDLib 1.8.35** built from commit `9b6ff5863e5d0b2a07b50f4aa1a3344a51a1f80f`
-- **Minimal attack surface** - Alpine uses musl libc instead of glibc
+Based on the official `ruby:<version>-alpine`.
+- **Size**: Smallest (~150MB).
+- **Components**: Ruby, TDLib, musl libc.
+- **Best for**: Production, efficiency, small footprint.
 
 ### `slim`
 
-This variant is based on the official `ruby:3-slim` image (Debian-based) and provides:
+Based on the official `ruby:<version>-slim` (Debian Slim).
+- **Size**: Medium.
+- **Components**: Ruby, TDLib, glibc.
+- **Best for**: Environments needing glibc compatibility but smaller size than full Debian.
 
-- **Better compatibility** with Debian packages and libraries
-- **Ruby 3** on Debian slim
-- **TDLib 1.8.35** built from the same commit as Alpine version
-- **Suitable for development** - Easier to install additional Debian packages
+### `bookworm` / `trixie`
 
-### `bookworm`
-
-This variant is based on the official `ruby:3-bookworm` image (Debian 12) and provides:
-
-- **Full Debian environment** with comprehensive package availability
-- **Ruby 3** on Debian Bookworm
-- **TDLib 1.8.35** built from the same commit as other variants
-- **Ideal for complex applications** - Access to full Debian package ecosystem
+Based on the official `ruby:<version>-bookworm` or `trixie` (Full Debian).
+- **Size**: Largest.
+- **Components**: Full Debian environment.
+- **Best for**: Development, complex builds requiring many system libraries.
 
 ## Environment Variables
 
-- `TDLIB_BUILD_PATH` - Path to TDLib build directory (default: `/tdlib/build`)
+- `TDLIB_BUILD_PATH`: Path to TDLib build directory (default: `/tdlib/build`)
 
 ## Volumes
 
-- `/root/.tdlib-ruby` - Volume for TDLib session storage. Mount this volume to persist session data between container restarts.
+- `/root/.tdlib-ruby`: Recommended volume for TDLib session storage to persist data between restarts.
 
 ## TDLib Build Location
 
-The TDLib build output is located at `/tdlib/build`. You can reference this path when configuring your Ruby application to use TDLib.
+The TDLib build output is located at `/tdlib/build`. You can reference this path when configuring your Ruby application to use TDLib (e.g., configuring `tdlib-ruby` gem).
 
 ## License
 
-This Docker image is licensed under the [MIT License](https://opensource.org/licenses/MIT). TDLib is licensed under the [Boost Software License](https://github.com/tdlib/td/blob/master/LICENSE_1_0.txt). Ruby is licensed under the [Ruby License](https://www.ruby-lang.org/en/about/license.txt).
-
-## See Also
-
-- [TDLib Documentation](https://core.telegram.org/tdlib/docs/)
-- [tdlib-ruby Gem](https://github.com/tdlib/tdlib-ruby)
-- [Official Ruby Docker Image](https://hub.docker.com/_/ruby)
-
+This Docker image is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+- **TDLib**: [Boost Software License](https://github.com/tdlib/td/blob/master/LICENSE_1_0.txt).
+- **Ruby**: [Ruby License](https://www.ruby-lang.org/en/about/license.txt).
