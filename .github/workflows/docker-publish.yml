@@ -1,0 +1,152 @@
+name: Build and Publish Docker Images
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: kirillbobykin/ruby-tdlib
+  TDLIB_VERSION: 1.8.35
+  LATEST_RUBY: "4.0.0"     # Указываем самую свежую версию Ruby для тега latest
+  LATEST_OS: "trixie"      # Указываем дефолтную ОС
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version: ["4.0.0", "3.4.8", "3.3.10", "3.2.9"]
+        os: ["trixie", "bookworm", "alpine3.23", "alpine3.22"]
+        variant: ["default", "slim"]
+        exclude:
+          # Alpine не имеет slim версии
+          - os: alpine3.23
+            variant: slim
+          - os: alpine3.22
+            variant: slim
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Generate Metadata (Tags & Base Image)
+        id: meta
+        shell: bash
+        run: |
+          # 1. Определение Base Image и Dockerfile
+          RUBY_VER="${{ matrix.ruby-version }}"
+          OS="${{ matrix.os }}"
+          VARIANT="${{ matrix.variant }}"
+          
+          # Разбор версий Ruby (Major, Minor)
+          # Пример: 4.0.0 -> MAJOR=4, MINOR=4.0
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$RUBY_VER"
+          RUBY_MAJOR="$MAJOR"
+          RUBY_MINOR="$MAJOR.$MINOR"
+          
+          BASE_TAG="${RUBY_VER}"
+          DOCKERFILE="debian.Dockerfile"
+          
+          # Формирование базового тега (например, 4.0.0-slim-trixie)
+          if [[ "$OS" == *"alpine"* ]]; then
+            DOCKERFILE="Dockerfile"
+            # Для Alpine нет slim, просто alpineX.XX
+            BASE_TAG="${RUBY_VER}-${OS}"
+          else
+            # Для Debian (Trixie/Bookworm)
+            if [[ "$VARIANT" == "slim" ]]; then
+              BASE_TAG="${RUBY_VER}-slim-${OS}"
+            else
+              BASE_TAG="${RUBY_VER}-${OS}"
+            fi
+          fi
+          
+          echo "base_image=ruby:${BASE_TAG}" >> $GITHUB_OUTPUT
+          echo "dockerfile=${DOCKERFILE}" >> $GITHUB_OUTPUT
+          
+          # 2. Генерация списка тегов для вашего образа
+          # Мы будем генерировать теги с суффиксом -tdlib-${TDLIB_VERSION}
+          # И добавлять алиасы для удобства
+          
+          TAGS=()
+          SUFFIX="-tdlib-${{ env.TDLIB_VERSION }}"
+          
+          # Функция для добавления тега
+          add_tag() {
+            local tag=$1
+            TAGS+=("${{ env.IMAGE_NAME }}:${tag}${SUFFIX}")
+            # Опционально: если хотите "чистые" теги без версии tdlib (перезаписывая latest), раскомментируйте:
+            # TAGS+=("${{ env.IMAGE_NAME }}:${tag}") 
+          }
+          
+          # Базовые алиасы версии Ruby (4.0.0, 4.0, 4)
+          RUBY_ALIASES=("$RUBY_VER" "$RUBY_MINOR" "$RUBY_MAJOR")
+          
+          # Формируем алиасы ОС (trixie, slim-trixie, alpine3.23)
+          OS_SUFFIX=""
+          if [[ "$OS" == *"alpine"* ]]; then
+            OS_SUFFIX="-${OS}" # -alpine3.23
+          else
+            if [[ "$VARIANT" == "slim" ]]; then
+              OS_SUFFIX="-slim-${OS}"
+            else
+              OS_SUFFIX="-${OS}"
+            fi
+          fi
+
+          # Генерируем комбинации
+          for r_alias in "${RUBY_ALIASES[@]}"; do
+            # Полный тег: 4.0.0-trixie, 4.0-trixie, 4-trixie
+            add_tag "${r_alias}${OS_SUFFIX}"
+            
+            # Сокращенный тег для Alpine (4.0-alpine вместо 4.0-alpine3.23), если это alpine
+            if [[ "$OS" == *"alpine"* ]]; then
+               # Если это alpine3.23 (последний), добавляем просто -alpine
+               if [[ "$OS" == "alpine3.23" ]]; then
+                  add_tag "${r_alias}-alpine"
+               fi
+            fi
+            
+            # Сокращенный тег для Debian (4.0-slim вместо 4.0-slim-trixie), если это дефолтная ОС (trixie)
+            if [[ "$OS" == "${{ env.LATEST_OS }}" ]]; then
+               if [[ "$VARIANT" == "slim" ]]; then
+                 add_tag "${r_alias}-slim"
+               else
+                 add_tag "${r_alias}" # Просто 4.0.0, 4.0, 4
+               fi
+            fi
+          done
+          
+          # Обработка 'latest'
+          # Если это самая новая версия Ruby и дефолтная ОС и не slim
+          if [[ "$RUBY_VER" == "${{ env.LATEST_RUBY }}" && "$OS" == "${{ env.LATEST_OS }}" && "$VARIANT" == "default" ]]; then
+             add_tag "latest"
+          fi
+          
+          # Преобразуем массив в строку через запятую
+          IFS=,
+          echo "tags=${TAGS[*]}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ steps.meta.outputs.dockerfile }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            BASE_IMAGE=${{ steps.meta.outputs.base_image }}

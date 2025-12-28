@@ -1,4 +1,5 @@
-FROM ruby:3-bookworm
+ARG BASE_IMAGE=ruby:3.4-bookworm
+FROM ${BASE_IMAGE}
 
 RUN apt-get update && apt-get install -y \
     git \

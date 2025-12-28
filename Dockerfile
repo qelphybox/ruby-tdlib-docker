@@ -1,4 +1,5 @@
-FROM ruby:3.4.7-alpine3.22 AS tdlib-builder
+ARG BASE_IMAGE=ruby:3.4-alpine
+FROM ${BASE_IMAGE}
 
 RUN apk add --no-cache git cmake g++ make gperf linux-headers openssl-dev zlib-dev
 
@@ -17,4 +18,3 @@ ENV TDLIB_BUILD_PATH=/tdlib/build
 VOLUME /root/.tdlib-ruby
 
 CMD ["sh"]
-
