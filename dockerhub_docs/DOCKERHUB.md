@@ -98,9 +98,9 @@ volumes:
 
 | Variant | Base Image | Size | Use Case |
 |---------|------------|------|----------|
-| **Alpine** | `ruby:alpine` | ~150MB | **Production**, minimal footprint |
-| **Slim** | `ruby:slim` | Medium | Needs glibc, but smaller than full OS |
-| **Bookworm** | `ruby:bookworm` | Large | Development, full system libraries |
+| **Alpine** | `ruby:alpine` | ~325MB | **Production**, minimal footprint |
+| **Slim** | `ruby:slim` | ~395MB | Needs glibc, but smaller than full OS |
+| **Bookworm** | `ruby:bookworm` | ~550MB | Development, full system libraries |
 
 ## Configuration
 
