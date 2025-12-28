@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: ["4.0.0", "3.4.8", "3.3.10", "3.2.9"]
+        ruby-version: ["4.0.0", "3.4.8", "3.4.7", "3.4.6", "3.3.10", "3.2.9"]
         os: ["trixie", "bookworm", "alpine3.23", "alpine3.22"]
         variant: ["default", "slim"]
         exclude:

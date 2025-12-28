@@ -2,88 +2,90 @@
 
 ![Docker Image Version](https://img.shields.io/docker/v/kirillbobykin/ruby-tdlib)
 
+Docker images containing Ruby, pre-compiled TDLib (v1.8.35), and necessary build dependencies.  
+Ready-to-use for Ruby applications powered by [tdlib-ruby](https://github.com/tdlib/tdlib-ruby), Telegram bots, and clients.
 
+## Supported Versions
 
-Minimal Docker images containing Ruby, TDLib, and necessary dependencies.  
-Useful for running Ruby applications that depend on [tdlib-ruby](https://github.com/tdlib/tdlib-ruby) or building Telegram bots and clients.
+The project automatically builds images for multiple Ruby versions and OS variants.
 
-## Available Images
+| Ruby Version | OS Variants | Docker Tags Example |
+|--------------|-------------|---------------------|
+| **4.0.0** (Latest) | Alpine, Slim, Bookworm | `4.0-alpine`, `4.0-slim`, `4.0-trixie` |
+| **3.4.8** | Alpine, Slim, Bookworm | `3.4-alpine`, `3.4-slim`, `3.4-bookworm` |
+| **3.3.10** | Alpine, Slim, Bookworm | `3.3-alpine`, `3.3-slim`, `3.3-bookworm` |
+| **3.2.9** | Alpine, Slim, Bookworm | `3.2-alpine`, `3.2-slim`, `3.2-bookworm` |
 
-### Alpine Version (Recommended)
-- **Image**: `kirillbobykin/ruby-tdlib:3.4.7-alpine-tdlib-1.8.35-latest`
-- Ruby 3.4.7 based on Alpine 3.22
-- Minimal image size
-- Ideal for production
+> All tags include a suffix with the TDLib version, e.g., `4.0-alpine-tdlib-1.8.35`.  
+> Short aliases (like `latest`, `4.0`, `alpine`) are also available.
 
-### Slim Version (Debian-based)
-- **Image**: `kirillbobykin/ruby-tdlib:3-slim-tdlib-1.8.35-latest`
-- Ruby 3 based on Debian slim
-- Better compatibility with Debian packages
-- Suitable for development and testing
+## Image Variants
 
-### Bookworm Version (Debian 12)
-- **Image**: `kirillbobykin/ruby-tdlib:3-bookworm-tdlib-1.8.35-latest`
-- Ruby 3 based on Debian Bookworm
-- Full Debian environment with more packages available
-- Ideal for applications requiring Debian-specific tools
+### 1. Alpine (Recommended)
+Based on Alpine Linux (3.22 / 3.23).  
+- **Size**: Smallest (~150MB).
+- **Use case**: Production environments, efficiency.
+- **Tag format**: `ruby_ver-alpine-tdlib-ver` (e.g., `3.4-alpine-tdlib-1.8.35`)
+
+### 2. Slim (Debian)
+Based on Debian Slim.
+- **Size**: Medium.
+- **Use case**: If you need glibc or Debian packages but want a smaller image than full Debian.
+- **Tag format**: `ruby_ver-slim-tdlib-ver` (e.g., `3.4-slim-tdlib-1.8.35`)
+
+### 3. Bookworm / Trixie (Full Debian)
+Based on standard Debian releases.
+- **Size**: Largest.
+- **Use case**: Development, or when you need a full suite of standard tools.
+- **Tag format**: `ruby_ver-bookworm-tdlib-ver` (e.g., `3.4-bookworm-tdlib-1.8.35`)
 
 ## Features
 
-- TDLib built from commit `9b6ff5863e5d0b2a07b50f4aa1a3344a51a1f80f` (v1.8.35)
-- Small image footprint
-- Volume for TDLib session storage at `/root/.tdlib-ruby`
+- **TDLib Version**: `1.8.35` (commit `9b6ff5863e5d0b2a07b50f4aa1a3344a51a1f80f`)
+- **Pre-configured**: TDLib is compiled and ready at `/tdlib`.
+- **Environment**: `TDLIB_BUILD_PATH` is set to `/tdlib/build`.
+- **Volume**: `/root/.tdlib-ruby` defined for session persistence.
 
 ## Usage
 
-| Action | Alpine | Slim | Bookworm |
-|--------|--------|------|----------|
-| **Build** | `make build-image` | `make build-slim-image` | `make build-bookworm-image` |
-| **Push** | `make push-image` | `make push-slim-image` | `make push-bookworm-image` |
-| **Run** | `make run-image` | `make run-slim-image` | `make run-bookworm-image` |
-| **Run interactively** | `docker run --rm -it kirillbobykin/ruby-tdlib:3.4.7-alpine-tdlib-1.8.35-latest` | `docker run --rm -it kirillbobykin/ruby-tdlib:3-slim-tdlib-1.8.35-latest` | `docker run --rm -it kirillbobykin/ruby-tdlib:3-bookworm-tdlib-1.8.35-latest` |
+### Run directly
+```bash
+# Run latest stable (Ruby 4.0 + Trixie)
+docker run --rm -it kirillbobykin/ruby-tdlib:latest bash
 
-> The TDLib build output is at `/tdlib/build`.  
-> You can mount your source code and use this image as a base for your own TDLib-dependent apps.
+# Run specific version (Ruby 3.4 on Alpine)
+docker run --rm -it kirillbobykin/ruby-tdlib:3.4-alpine sh
+```
 
-## Example Docker Compose Service
+### Docker Compose Example
 
-**Alpine version:**
 ```yaml
 services:
-  my-tdlib-app:
-    image: kirillbobykin/ruby-tdlib:3.4.7-alpine-tdlib-1.8.35-latest
+  my-bot:
+    image: kirillbobykin/ruby-tdlib:3.4-alpine-tdlib-1.8.35
     volumes:
       - .:/app
+      # Persist TDLib session data
       - tdlib-session:/root/.tdlib-ruby
+    command: ruby my_bot.rb
 
 volumes:
   tdlib-session:
 ```
 
-**Slim version:**
-```yaml
-services:
-  my-tdlib-app:
-    image: kirillbobykin/ruby-tdlib:3-slim-tdlib-1.8.35-latest
-    volumes:
-      - .:/app
-      - tdlib-session:/root/.tdlib-ruby
+## Build Locally
 
-volumes:
-  tdlib-session:
-```
+You can build specific images locally using the `Makefile`.
 
-**Bookworm version:**
-```yaml
-services:
-  my-tdlib-app:
-    image: kirillbobykin/ruby-tdlib:3-bookworm-tdlib-1.8.35-latest
-    volumes:
-      - .:/app
-      - tdlib-session:/root/.tdlib-ruby
+```bash
+# Build Alpine image
+make build-image
 
-volumes:
-  tdlib-session:
+# Build Slim image
+make build-slim-image
+
+# Build Bookworm image
+make build-bookworm-image
 ```
 
 ## About TDLib
@@ -92,5 +94,4 @@ volumes:
 
 ---
 
-**Images maintained by [kirillbobykin](https://github.com/qelphybox).** PRs and issues welcome!
-
+**Maintained by [kirillbobykin](https://github.com/qelphybox).**
