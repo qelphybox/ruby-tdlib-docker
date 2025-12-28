@@ -29,6 +29,9 @@ jobs:
             variant: slim
           - os: alpine3.22
             variant: slim
+          # Exclude failing build for 3.4.6 on alpine3.23
+          - ruby-version: "3.4.6"
+            os: alpine3.23
 
     steps:
       - name: Checkout repository
